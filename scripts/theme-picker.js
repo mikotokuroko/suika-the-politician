@@ -8,6 +8,49 @@
   let selectedTheme = null;
   let previewImages = [];
   let previewRequest = 0;
+  let savedCrops = {};
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem("mywho_theme_crops") || "{}",
+    );
+    if (stored && typeof stored === "object" && !Array.isArray(stored)) {
+      for (const [source, settings] of Object.entries(stored)) {
+        if (
+          settings &&
+          Number.isFinite(settings.zoom) &&
+          settings.zoom >= 0.5 &&
+          settings.zoom <= 4 &&
+          Number.isFinite(settings.cx) &&
+          settings.cx >= 0 &&
+          settings.cx <= 1 &&
+          Number.isFinite(settings.cy) &&
+          settings.cy >= 0 &&
+          settings.cy <= 1
+        )
+          savedCrops[source] = settings;
+      }
+    }
+  } catch {}
+  const themeCrop = (theme, index) =>
+    savedCrops[theme.sources[index]] || theme.crops?.[index] || defaults();
+
+  function openCrop(photo) {
+    editing = photo;
+    const side =
+      Math.min(photo.image.naturalWidth, photo.image.naturalHeight) /
+      photo.settings.zoom;
+    $("crop-zoom").value = photo.settings.zoom;
+    $("crop-x").value =
+      photo.settings.cx ??
+      ((photo.image.naturalWidth - side) * photo.settings.x + side / 2) /
+        photo.image.naturalWidth;
+    $("crop-y").value =
+      photo.settings.cy ??
+      ((photo.image.naturalHeight - side) * photo.settings.y + side / 2) /
+        photo.image.naturalHeight;
+    previewCrop();
+    $("crop-dialog").showModal();
+  }
   const defaults = () => ({ zoom: 1, x: 0.5, y: 0.5 });
   const levelCount = () => Number($("level-count").value);
   const validCount = () =>
@@ -80,12 +123,7 @@
         item.append(button);
       }
       action(t("裁剪"), t("重新裁剪等级 {n}", { n: index + 1 }), () => {
-        editing = photo;
-        $("crop-zoom").value = photo.settings.zoom;
-        $("crop-x").value = photo.settings.x;
-        $("crop-y").value = photo.settings.y;
-        previewCrop();
-        $("crop-dialog").showModal();
+        openCrop(photo);
       });
       action(
         "↑",
@@ -123,8 +161,8 @@
   function cropSettings() {
     return {
       zoom: Number($("crop-zoom").value),
-      x: Number($("crop-x").value),
-      y: Number($("crop-y").value),
+      cx: Number($("crop-x").value),
+      cy: Number($("crop-y").value),
     };
   }
   function previewCrop() {
@@ -137,8 +175,9 @@
   $("crop-save").addEventListener("click", () => {
     editing.settings = cropSettings();
     editing.cropped = crop(editing.image, editing.settings);
+    if (editing.save) editing.save(editing);
+    else renderPhotos();
     $("crop-dialog").close();
-    renderPhotos();
   });
   $("crop-dialog").addEventListener("close", () => {
     editing = null;
@@ -159,7 +198,7 @@
     const preview = document.createElement("img");
     loadImage(theme.sources[0])
       .then((image) => {
-        preview.src = crop(image, theme.crops?.[0] || defaults()).toDataURL();
+        preview.src = crop(image, themeCrop(theme, 0)).toDataURL();
       })
       .catch(() => {
         preview.src = theme.sources[0];
@@ -193,7 +232,7 @@
         const images = await Promise.all(theme.sources.map(loadImage));
         if (request !== previewRequest) return;
         previewImages = images.map((image, index) =>
-          crop(image, theme.crops?.[index] || defaults()),
+          crop(image, themeCrop(theme, index)),
         );
         previewImages.forEach((canvas, index) => {
           const item = document.createElement("li");
@@ -204,7 +243,39 @@
           const number = document.createElement("span");
           number.textContent = index + 1;
           number.setAttribute("aria-hidden", "true");
-          item.append(image, number);
+          const edit = document.createElement("button");
+          edit.type = "button";
+          edit.className = "level-crop-button";
+          edit.dataset.cropLevel = index + 1;
+          edit.setAttribute(
+            "aria-label",
+            t("重新裁剪等级 {n}", { n: index + 1 }),
+          );
+          edit.append(image, number);
+          edit.addEventListener("click", () =>
+            openCrop({
+              image: images[index],
+              settings: themeCrop(theme, index),
+              save(photo) {
+                savedCrops[theme.sources[index]] = photo.settings;
+                previewImages[index] = photo.cropped;
+                image.src = photo.cropped.toDataURL();
+                if (index === 0) preview.src = image.src;
+                try {
+                  localStorage.setItem(
+                    "mywho_theme_crops",
+                    JSON.stringify(savedCrops),
+                  );
+                  $("preview-status").textContent = t("裁剪已保存到此浏览器。");
+                } catch {
+                  $("preview-status").textContent = t(
+                    "裁剪已应用，但无法保存到浏览器。刷新后将恢复默认。",
+                  );
+                }
+              },
+            }),
+          );
+          item.append(edit);
           $("level-preview-list").append(item);
         });
         $("preview-status").textContent = "";
@@ -304,6 +375,14 @@
     $("customize").focus();
   });
   document.addEventListener("languagechange", () => {
+    document
+      .querySelectorAll("[data-crop-level]")
+      .forEach((button) =>
+        button.setAttribute(
+          "aria-label",
+          t("重新裁剪等级 {n}", { n: button.dataset.cropLevel }),
+        ),
+      );
     document.querySelectorAll("[data-preview-level]").forEach((image) => {
       image.alt = t("等级 {n}", { n: image.dataset.previewLevel });
     });

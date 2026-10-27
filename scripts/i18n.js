@@ -1,4 +1,17 @@
 const TRANSLATIONS = {
+  "点击任意图片调整裁剪。修改仅保存在此浏览器。": {
+    en: "Click any image to adjust its crop. Changes are saved only in this browser.",
+    fr: "Cliquez sur une image pour la recadrer. Les modifications sont enregistrées uniquement dans ce navigateur.",
+  },
+  "裁剪已保存到此浏览器。": {
+    en: "Crop saved in this browser.",
+    fr: "Cadrage enregistré dans ce navigateur.",
+  },
+  "裁剪已应用，但无法保存到浏览器。刷新后将恢复默认。": {
+    en: "Crop applied, but browser storage is unavailable. Reloading will restore the default.",
+    fr: "Cadrage appliqué, mais le stockage est indisponible. Le cadrage par défaut sera rétabli au rechargement.",
+  },
+
   选择照片: { en: "Choose photos", fr: "Choisir des photos" },
   "最多 15 张 · 自动圆形裁剪": {
     en: "Up to 15 · Automatic circular crops",
@@ -13,8 +26,8 @@ const TRANSLATIONS = {
   开始游戏: { en: "Play", fr: "Jouer" },
 
   合成大迈乎: {
-    en: "Suika Your Rival",
-    fr: "Suika ton Rival",
+    en: "Suika the Politician",
+    fr: "Suika le Politicien",
   },
   选择你的合成主题: {
     en: "Choose your theme",

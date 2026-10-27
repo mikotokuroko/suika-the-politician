@@ -411,3 +411,21 @@ input:focus-visible {
   background: var(--red);
   color: var(--ink);
 }
+
+.level-crop-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--soft);
+  font: inherit;
+  cursor: pointer;
+}
+.level-crop-button:hover {
+  background: var(--red);
+  border-color: var(--soft);
+}

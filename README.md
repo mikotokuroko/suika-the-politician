@@ -1,7 +1,6 @@
-# 合成大迈乎
+# 合成大仇人
 
-A static canvas merge game. No build step or dependencies are required.
-
+感谢@Anonymous contributor 开源合成大迈乎。
 ## Run locally
 
 From the repository root:
@@ -57,8 +56,7 @@ JPEG, or WebP.
 ## Languages and portrait framing
 
 The first visit uses the first supported browser language (Chinese, French, or
-English), falling back to English. The theme screen and game toolbar let users
-choose a language; that saved choice takes precedence on later visits. UI translations live in
+English), falling back to English. A manually selected language is remembered locally. UI translations live in
 `scripts/i18n.js`.
 
 Built-in face framing is stored alongside image paths in `scripts/themes.js` as
@@ -66,3 +64,15 @@ normalized face centers (`cx`, `cy`) and zoom. Originals are unchanged. The same
 crops are used for theme thumbnails and game sprites. Zooming out adds a dark red
 background where a source image does not cover the circle. Custom crops also allow
 zooming out to keep a whole head in view. Missing image entries are excluded.
+
+## Photo ownership and use
+
+I do not own the photos, portraits, memes, or other third-party images included in
+this project. All rights belong to their respective creators and rights holders.
+These images are used for entertainment and parody; their inclusion does not imply
+endorsement by or affiliation with the people depicted or the rights holders.
+
+This repository does not grant permission or a license to reuse third-party images.
+If you upload custom photos, use images you own or have permission to use. If you are
+a rights holder and would like an image credited or removed, please open an issue
+in this repository so it can be addressed.
