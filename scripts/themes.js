@@ -1,0 +1,161 @@
+window.BUILT_IN_THEMES = [
+  {
+    id: "mywho",
+    name: "迈乎",
+    sources: [
+      "assets/images/mywho/level-01.png",
+      "assets/images/mywho/level-02.png",
+      "assets/images/mywho/level-03.png",
+      "assets/images/mywho/level-04.png",
+      "assets/images/mywho/level-05.png",
+      "assets/images/mywho/level-06.png",
+      "assets/images/mywho/level-07.png",
+      "assets/images/mywho/level-08.png",
+      "assets/images/mywho/level-09.png",
+      "assets/images/mywho/level-10.png",
+      "assets/images/mywho/level-11.png",
+    ],
+  },
+  {
+    id: "mbappe",
+    name: "姆巴佩",
+    sources: [
+      "assets/images/mbappe/level-01.png",
+      "assets/images/mbappe/level-02.png",
+      "assets/images/mbappe/level-03.png",
+      "assets/images/mbappe/level-04.png",
+      "assets/images/mbappe/level-05.png",
+      "assets/images/mbappe/level-06.png",
+      "assets/images/mbappe/level-07.png",
+      "assets/images/mbappe/level-08.png",
+      "assets/images/mbappe/level-09.png",
+      "assets/images/mbappe/level-10.png",
+    ],
+    crops: [
+      {
+        cx: 0.5,
+        cy: 0.36,
+        zoom: 1,
+      },
+      {
+        cx: 0.5,
+        cy: 0.38,
+        zoom: 1,
+      },
+      {
+        cx: 0.55,
+        cy: 0.45,
+        zoom: 0.9,
+      },
+      {
+        cx: 0.52,
+        cy: 0.4,
+        zoom: 0.9,
+      },
+      {
+        cx: 0.5,
+        cy: 0.37,
+        zoom: 0.85,
+      },
+      {
+        cx: 0.53,
+        cy: 0.85,
+        zoom: 2.2,
+      },
+      {
+        cx: 0.6,
+        cy: 0.39,
+        zoom: 1.1,
+      },
+      {
+        cx: 0.52,
+        cy: 0.63,
+        zoom: 1.8,
+      },
+      {
+        cx: 0.55,
+        cy: 0.31,
+        zoom: 1.5,
+      },
+      {
+        cx: 0.5,
+        cy: 0.3,
+        zoom: 1.4,
+      },
+    ],
+  },
+  {
+    id: "macron",
+    name: "马克龙",
+    sources: [
+      "assets/images/macron/level-01.png",
+      "assets/images/macron/level-02.png",
+      "assets/images/macron/level-03.png",
+      "assets/images/macron/level-04.png",
+      "assets/images/macron/level-05.png",
+      "assets/images/macron/level-06.png",
+      "assets/images/macron/level-07.png",
+      "assets/images/macron/level-08.png",
+      "assets/images/macron/level-09.png",
+      "assets/images/macron/level-10.png",
+      "assets/images/macron/level-11.png",
+    ],
+    crops: [
+      {
+        cx: 0.5,
+        cy: 0.32,
+        zoom: 1.6,
+      },
+      {
+        cx: 0.5,
+        cy: 0.36,
+        zoom: 0.85,
+      },
+      {
+        cx: 0.5,
+        cy: 0.2,
+        zoom: 2.3,
+      },
+      {
+        cx: 0.51,
+        cy: 0.45,
+        zoom: 0.7,
+      },
+      {
+        cx: 0.53,
+        cy: 0.35,
+        zoom: 1,
+      },
+      {
+        cx: 0.26,
+        cy: 0.19,
+        zoom: 2.4,
+      },
+      {
+        cx: 0.54,
+        cy: 0.42,
+        zoom: 0.9,
+      },
+      {
+        cx: 0.65,
+        cy: 0.15,
+        zoom: 2.4,
+      },
+      {
+        cx: 0.55,
+        cy: 0.24,
+        zoom: 1.5,
+      },
+      {
+        cx: 0.5,
+        cy: 0.35,
+        zoom: 1.4,
+      },
+      {
+        cx: 0.78,
+        cy: 0.25,
+        zoom: 1.5,
+      },
+    ],
+  },
+];
