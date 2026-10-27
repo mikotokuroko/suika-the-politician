@@ -25,8 +25,11 @@ access when location cannot be determined.
 - `scripts/theme-picker.js`: theme selection, local photo upload, and circular cropping.
 
 Built-in image order is explicit in `scripts/themes.js`; edit that list to change the progression. Radii adapt to the number of levels. Scores remain stored
-under the `xigua_best` local storage key. GoatCounter tracks page views and game-over
-events.
+under the `xigua_best` local storage key. Cloudflare Web Analytics measures visits,
+page views, and loading performance without cookies or tracking individual visitors.
+The site remains hosted on GitHub Pages. Analytics are available in the owner's
+Cloudflare dashboard under **Web Analytics → mikotokuroko.github.io**; filter by
+the `/suika-the-politician/` path to view this game.
 
 ## Deploy
 

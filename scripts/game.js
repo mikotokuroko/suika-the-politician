@@ -313,9 +313,6 @@
   function endGame() {
     over = true;
     sfxOver();
-    try {
-      goatcounter.count({ path: "game-over", title: "游戏结束", event: true });
-    } catch (e) {}
     if (score > best) {
       best = score;
       try {
