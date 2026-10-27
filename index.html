@@ -34,6 +34,7 @@
   #over button{margin-top:6px;border:0;background:var(--red);color:#f2cf4a;font:inherit;font-size:18px;
     padding:10px 28px;border-radius:999px;cursor:pointer}
 </style>
+<script data-goatcounter="https://mywho.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 <div id="app">
@@ -222,6 +223,7 @@ function drop(){
 
 function endGame(){
   over=true; sfxOver();
+  try{goatcounter.count({path:'game-over',title:'游戏结束',event:true});}catch(e){}
   if(score>best){best=score;try{localStorage.setItem('xigua_best',best);}catch(e){}elBest.textContent=best;}
   elFs.textContent=score;
   elOver.classList.add('show');
