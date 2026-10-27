@@ -1,6 +1,7 @@
 # 合成大仇人
 
-感谢@Anonymous contributor 开源合成大迈乎。
+![Suika the Politician theme selection](preview.png)
+
 ## Run locally
 
 From the repository root:
@@ -65,7 +66,7 @@ crops are used for theme thumbnails and game sprites. Zooming out adds a dark re
 background where a source image does not cover the circle. Custom crops also allow
 zooming out to keep a whole head in view. Missing image entries are excluded.
 
-## Photo ownership and use
+## Disclaimer
 
 I do not own the photos, portraits, memes, or other third-party images included in
 this project. All rights belong to their respective creators and rights holders.
@@ -76,3 +77,7 @@ This repository does not grant permission or a license to reuse third-party imag
 If you upload custom photos, use images you own or have permission to use. If you are
 a rights holder and would like an image credited or removed, please open an issue
 in this repository so it can be addressed.
+
+This project was originally forked from another GitHub user's work. To protect
+their safety amid concerns about local laws, I have chosen not to identify or tag
+them in this repository.
