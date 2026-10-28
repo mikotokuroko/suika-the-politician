@@ -119,7 +119,6 @@
     return response.status === 204 ? null : response.json();
   }
   function makeLink(id, token) {
-    if (!token) return `${api}/share/${id}`;
     const link = new URL(location.href);
     link.search = "";
     link.searchParams.set("game", id);
@@ -139,9 +138,6 @@
     updateShare();
     $("share-status").textContent = t("正在保存分享…");
     try {
-      game.preview = (await window.gamePreview.render(game)).toDataURL(
-        "image/png",
-      );
       const saved = await request("/games", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

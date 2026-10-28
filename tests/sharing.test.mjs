@@ -54,6 +54,7 @@ const game = {
 const send = (path, method = "GET", body, extra = {}) =>
   mf.dispatchFetch("https://test.local" + path, {
     method,
+    redirect: "manual",
     headers: { Origin: origin, "Content-Type": "application/json", ...extra },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
@@ -212,7 +213,7 @@ test("rate limit returns a retryable error", async () => {
   }
 });
 
-test("social crawlers receive escaped custom metadata and the saved PNG without JavaScript", async () => {
+test("social crawlers receive escaped metadata and the standard preview even with a saved custom PNG", async () => {
   const title = 'Friends "><script>alert(1)</script> & family';
   const response = await send("/games", "POST", {
     ...game,
@@ -239,10 +240,10 @@ test("social crawlers receive escaped custom metadata and the saved PNG without 
   );
   assert.ok(
     html.includes(
-      `property="og:image" content="https://test.local${url}/image"`,
+      'property="og:image" content="https://mikotokuroko.github.io/suika-the-politician/preview.png"',
     ),
   );
-  assert.ok(html.includes('property="og:image:width" content="1200"'));
+  assert.ok(html.includes('property="og:image:width" content="1456"'));
   assert.ok(html.includes('name="twitter:card" content="summary_large_image"'));
   assert.ok(html.includes("Themes: Custom photos."));
   assert.ok(
@@ -263,8 +264,11 @@ test("social crawlers receive escaped custom metadata and the saved PNG without 
     /script-src 'nonce-/,
   );
   const image = await send(url + "/image");
-  assert.equal(image.headers.get("content-type"), "image/png");
-  assert.deepEqual(Buffer.from(await image.arrayBuffer()), previewBytes);
+  assert.equal(image.status, 302);
+  assert.equal(
+    image.headers.get("location"),
+    "https://mikotokuroko.github.io/suika-the-politician/preview.png",
+  );
   assert.equal(await (await send(url, "HEAD")).text(), "");
   assert.equal(await (await send(url + "/image", "HEAD")).text(), "");
   await send("/games/" + saved.id, "DELETE", undefined, {
@@ -292,8 +296,8 @@ test("legacy shares without a preview retain their data, deletion metadata and o
   assert.deepEqual(await (await send(`/games/${id}`)).json(), legacy);
   assert.equal((await send(`/share/${id}`)).status, 200);
   assert.equal(
-    (await send(`/share/${id}/image`)).headers.get("content-type"),
-    "image/png",
+    (await send(`/share/${id}/image`)).headers.get("location"),
+    "https://mikotokuroko.github.io/suika-the-politician/preview.png",
   );
   const entry = (await namespace.list({ prefix: `games/${id}` })).keys[0];
   assert.equal(entry.expiration, expiresAt);
