@@ -1,4 +1,4 @@
-# 合成大仇人
+# 合成不可说
 
 ![Suika the Politician cover photo](preview.png)
 

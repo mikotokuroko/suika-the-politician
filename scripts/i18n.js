@@ -153,7 +153,7 @@ const TRANSLATIONS = {
   },
   开始游戏: { en: "Play", fr: "Jouer" },
 
-  合成大迈乎: {
+  合成不可说: {
     en: "Suika the Politician",
     fr: "Suika le Politicien",
   },
@@ -352,7 +352,7 @@ const TRANSLATIONS = {
   }
   function apply() {
     document.documentElement.lang = language === "zh" ? "zh-CN" : language;
-    document.title = t("合成大迈乎");
+    document.title = t("合成不可说");
     document
       .querySelectorAll("[data-i18n]")
       .forEach((el) => (el.textContent = t(el.dataset.i18n)));
