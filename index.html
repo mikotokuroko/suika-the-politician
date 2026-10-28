@@ -163,7 +163,59 @@
             <p data-i18n="颜色会立即应用，游戏预览也会使用这些颜色。">
               颜色会立即应用，游戏预览也会使用这些颜色。
             </p>
-            <div id="palette-controls" class="palette-controls"></div>
+            <div class="palette-workspace">
+              <section
+                class="palette-preview"
+                aria-labelledby="color-preview-title"
+              >
+                <h3 id="color-preview-title" data-i18n="实时预览">实时预览</h3>
+                <div
+                  class="preview-switches"
+                  role="group"
+                  aria-label="预览画面"
+                  data-i18n-label="预览画面"
+                >
+                  <button
+                    id="preview-selection"
+                    type="button"
+                    class="secondary-button"
+                    aria-pressed="true"
+                    data-i18n="主题选择"
+                  >
+                    主题选择
+                  </button>
+                  <button
+                    id="preview-board"
+                    type="button"
+                    class="secondary-button"
+                    aria-pressed="false"
+                    data-i18n="游戏区域"
+                  >
+                    游戏区域
+                  </button>
+                </div>
+                <canvas
+                  id="color-preview"
+                  width="1200"
+                  height="630"
+                  role="img"
+                  aria-label="主题与游戏配色预览"
+                  data-i18n-label="主题与游戏配色预览"
+                ></canvas>
+                <button
+                  id="preview-game-over"
+                  type="button"
+                  class="secondary-button"
+                  aria-pressed="false"
+                  hidden
+                  data-i18n="预览结束画面"
+                >
+                  预览结束画面
+                </button>
+                <p id="color-preview-status" role="status"></p>
+              </section>
+              <div id="palette-controls" class="palette-controls"></div>
+            </div>
             <button
               id="reset-palette"
               type="button"
@@ -380,6 +432,7 @@
     <script src="scripts/game.js"></script>
     <script src="scripts/theme-picker.js"></script>
     <script src="scripts/sharing-config.js"></script>
+    <script src="scripts/game-preview.js"></script>
     <script src="scripts/sharing.js"></script>
     <script
       type="module"

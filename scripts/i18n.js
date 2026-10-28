@@ -1,4 +1,21 @@
 const TRANSLATIONS = {
+  实时预览: { en: "Live preview", fr: "Aperçu en direct" },
+  预览画面: { en: "Preview screen", fr: "Écran à prévisualiser" },
+  主题选择: { en: "Theme selection", fr: "Choix du thème" },
+  主题与游戏配色预览: {
+    en: "Theme selection and game color preview",
+    fr: "Aperçu des thèmes et des couleurs du jeu",
+  },
+  预览结束画面: { en: "Preview game over", fr: "Aperçu de fin de partie" },
+  "添加照片或选择一个默认主题以查看预览。": {
+    en: "Add photos or select a built-in theme to preview.",
+    fr: "Ajoutez des photos ou choisissez un thème pour le prévisualiser.",
+  },
+  "预览图片加载失败，请重试。": {
+    en: "Preview images could not load. Please retry.",
+    fr: "Impossible de charger les images de l’aperçu. Réessayez.",
+  },
+  复制分享链接: { en: "Copy share link", fr: "Copier le lien de partage" },
   "分享将在 14 天后自动删除，包括上传的照片。": {
     en: "Shared games and uploaded photos are automatically deleted after 14 days.",
     fr: "Les jeux partagés et les photos envoyées sont automatiquement supprimés après 14 jours.",

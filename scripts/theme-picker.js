@@ -415,6 +415,9 @@
     count() {
       return photos.length;
     },
+    previewImages() {
+      return photos.map((photo) => photo.cropped);
+    },
     snapshot() {
       return {
         images: photos.map((photo) =>

@@ -24,6 +24,7 @@ access when location cannot be determined.
 - `scripts/themes.js`: built-in theme names and image order.
 - `scripts/theme-picker.js`: theme selection, local photo upload, and circular cropping.
 - `scripts/palette.js`: shared color settings for the interface and game canvas.
+- `scripts/game-preview.js`: live color previews and the saved theme-selection card image.
 - `scripts/sharing.js`: creation, public game links, and private deletion links.
 - `sharing/worker.js`: Cloudflare Workers API with KV storage.
 
@@ -68,15 +69,31 @@ compressed WebP (PNG fallback) to conserve the free storage allowance. Originals
 are not uploaded. Uncheck all default themes for a custom-photos-only game, or
 share selected default themes with a palette even without uploading photos.
 
-The returned GitHub Pages URL contains a random game ID. Anyone with the link can
+New share links use `https://suika-sharing.hoicheoklam.workers.dev/share/<ID>`.
+Cloudflare serves Open Graph and Twitter metadata plus a PNG of that game's
+theme-selection screen, then opens the game on GitHub Pages. The card uses the
+saved name, cropped photos, selected default themes, and palette. It is rendered
+in the browser when saving, so no paid image-rendering service is needed.
+
+Existing GitHub Pages `?game=<ID>` links still work. Open one and use **Copy share
+link** for its preview-enabled URL. Messaging apps may retain cached cards for old
+links; JavaScript cannot change the static metadata GitHub Pages serves to crawlers.
+Anyone with a share link can
 view its photos and play. Each save creates a separate snapshot; editing your draft
 does not change an earlier link. Keep the separate private deletion link: there is
 no account or password recovery for it. Opening that link does not delete anything;
 the creator must use the delete button and confirm. Deletion cannot retract photos
 someone has already downloaded.
 
+The color editor has a live preview of theme selection, the game board, and the
+game-over screen. It updates with photos, theme checkboxes, title, and color changes.
+
 The backend uses **Cloudflare Workers Free and Workers KV**, with no R2 subscription.
 Each creation is a single KV value with a hashed deletion token in private metadata.
+Its optional `preview` PNG is kept in the same record and expires/deletes with it.
+Older records without that field remain valid. Their social card falls back to a
+photo from that game until a full card is added; it never adds excluded themes.
+Social platforms may retain their own image caches after deletion.
 Photos are bounded to 15, uploads to 8 MiB, and requests are rate-limited. KV is
 eventually consistent: new links and deletions can take about a minute or longer
 to propagate between regions. Shared games and their uploaded photos automatically

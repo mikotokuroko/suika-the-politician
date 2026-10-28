@@ -1,6 +1,8 @@
 // Each creation is one KV value: its palette, theme choices and cropped images.
 const MAX_BODY = 8 * 1024 * 1024;
 const SHARE_LIFETIME_SECONDS = 14 * 24 * 60 * 60;
+const GAME_URL = "https://mikotokuroko.github.io/suika-the-politician/";
+const THEME_NAMES = { mywho: "Mywho", mbappe: "Mbappé", macron: "Macron" };
 const COLOR_KEYS = [
   "bg",
   "ink",
@@ -133,6 +135,32 @@ export function validateGame(input) {
       uint24(27) + 1 === 320;
     if (png ? !validPng : !validWebp) fail(400, "invalid_image");
   }
+  if (input.preview !== undefined) {
+    if (
+      typeof input.preview !== "string" ||
+      input.preview.length > 2000000 ||
+      !/^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/.test(input.preview)
+    )
+      fail(400, "invalid_preview");
+    let bytes;
+    try {
+      bytes = Uint8Array.from(atob(input.preview.slice(22, 66)), (c) =>
+        c.charCodeAt(0),
+      );
+    } catch {
+      fail(400, "invalid_preview");
+    }
+    const view = new DataView(bytes.buffer);
+    if (
+      bytes.length < 33 ||
+      view.getUint32(0) !== 0x89504e47 ||
+      view.getUint32(4) !== 0x0d0a1a0a ||
+      view.getUint32(12) !== 0x49484452 ||
+      view.getUint32(16) !== 1200 ||
+      view.getUint32(20) !== 630
+    )
+      fail(400, "invalid_preview");
+  }
   return {
     version: 1,
     title: input.title.trim(),
@@ -140,7 +168,98 @@ export function validateGame(input) {
     levels: input.levels,
     images: input.images,
     palette,
+    ...(input.preview === undefined ? {} : { preview: input.preview }),
   };
+}
+
+const escapeHtml = (value) =>
+  String(value).replace(
+    /[&<>"']/g,
+    (character) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        character
+      ],
+  );
+
+async function shareResponse(request, env, id, imageOnly, headers) {
+  if (!["GET", "HEAD"].includes(request.method))
+    fail(405, "method_not_allowed");
+  const game = await env.GAMES.get(`games/${id}.json`, "json");
+  if (!game || (game.expiresAt && game.expiresAt <= Date.now() / 1000)) {
+    return new Response(
+      request.method === "HEAD"
+        ? null
+        : "This shared game has expired or was deleted.",
+      {
+        status: 404,
+        headers: {
+          ...headers,
+          "Content-Type": "text/plain; charset=utf-8",
+          "X-Robots-Tag": "noindex",
+        },
+      },
+    );
+  }
+  const image = game.preview || game.images[0];
+  const fallback = `${GAME_URL}assets/images/${game.themes[0]}/level-01.png`;
+  const shareUrl = `${new URL(request.url).origin}/share/${id}`;
+  const imageUrl = image ? `${shareUrl}/image` : fallback;
+  if (imageOnly) {
+    if (!image) return Response.redirect(fallback, 302);
+    const [prefix, encoded] = image.split(",");
+    const type = prefix.includes("image/webp") ? "image/webp" : "image/png";
+    const bytes =
+      request.method === "HEAD"
+        ? null
+        : typeof Uint8Array.fromBase64 === "function"
+          ? Uint8Array.fromBase64(encoded)
+          : Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0));
+    return new Response(bytes, {
+      headers: { ...headers, "Content-Type": type, "X-Robots-Tag": "noindex" },
+    });
+  }
+  const title = escapeHtml(game.title);
+  const names = [
+    ...(game.images.length ? ["Custom photos"] : []),
+    ...game.themes.map((theme) => THEME_NAMES[theme]),
+  ];
+  const description = escapeHtml(
+    `Play ${game.title}. Themes: ${names.join(", ")}.`,
+  );
+  const playUrl = `${GAME_URL}?game=${id}`;
+  const nonce = crypto.randomUUID();
+  const safeImageUrl = escapeHtml(imageUrl);
+  const safeShareUrl = escapeHtml(shareUrl);
+  const imageType = image?.startsWith("data:image/webp")
+    ? "image/webp"
+    : "image/png";
+  const dimensions = game.preview
+    ? '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">'
+    : "";
+  const html = `<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title><meta name="description" content="${description}">
+<meta name="robots" content="noindex"><link rel="canonical" href="${safeShareUrl}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Suika the Politician">
+<meta property="og:title" content="${title}"><meta property="og:description" content="${description}">
+<meta property="og:url" content="${safeShareUrl}"><meta property="og:image" content="${safeImageUrl}">
+<meta property="og:image:type" content="${imageType}">${dimensions}
+<meta property="og:image:alt" content="Theme selection for ${title}">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${title}">
+<meta name="twitter:description" content="${description}"><meta name="twitter:image" content="${safeImageUrl}">
+<meta name="twitter:image:alt" content="Theme selection for ${title}">
+<style>body{margin:0;padding:24px;background:#171717;color:#fff;font:18px/1.5 system-ui;text-align:center}main{max-width:900px;margin:auto}img{max-width:100%;border-radius:16px}a{display:inline-block;padding:12px 24px;background:#fff;color:#171717;border-radius:12px}</style>
+</head><body><main><h1>${title}</h1><img src="${safeImageUrl}" alt="Theme selection for ${title}"><p><a href="${playUrl}">Play on GitHub Pages</a></p></main>
+<script nonce="${nonce}">location.replace(${JSON.stringify(playUrl)});</script></body></html>`;
+  return new Response(request.method === "HEAD" ? null : html, {
+    headers: {
+      ...headers,
+      "Content-Type": "text/html; charset=utf-8",
+      "Referrer-Policy": "no-referrer",
+      "Content-Security-Policy": `default-src 'none'; img-src 'self' https://mikotokuroko.github.io; style-src 'unsafe-inline'; script-src 'nonce-${nonce}'; base-uri 'none'; frame-ancestors 'none'`,
+      "X-Robots-Tag": "noindex",
+    },
+  });
 }
 
 export default {
@@ -158,6 +277,11 @@ export default {
     const json = (data, status = 200) =>
       Response.json(data, { status, headers });
     try {
+      const share = new URL(request.url).pathname.match(
+        /^\/share\/([a-f0-9]{32})(\/image)?$/,
+      );
+      if (share)
+        return await shareResponse(request, env, share[1], !!share[2], headers);
       if (origin && origin !== env.ALLOWED_ORIGIN) fail(403, "origin_denied");
       if (request.method === "OPTIONS")
         return new Response(null, { status: 204, headers });

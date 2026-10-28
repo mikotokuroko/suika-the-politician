@@ -21,6 +21,10 @@ after(() => mf.dispose());
 const fixtures = JSON.parse(
   await readFile(new URL("fixtures/circle.json", import.meta.url), "utf8"),
 );
+const previewBytes = await readFile(
+  new URL("fixtures/share-preview.png", import.meta.url),
+);
+const preview = "data:image/png;base64," + previewBytes.toString("base64");
 const palette = Object.fromEntries(
   [
     "bg",
@@ -205,5 +209,115 @@ test("rate limit returns a retryable error", async () => {
     );
   } finally {
     await limited.dispose();
+  }
+});
+
+test("social crawlers receive escaped custom metadata and the saved PNG without JavaScript", async () => {
+  const title = 'Friends "><script>alert(1)</script> & family';
+  const response = await send("/games", "POST", {
+    ...game,
+    title,
+    themes: [],
+    levels: 2,
+    images: [fixtures.webp, fixtures.webp],
+    preview,
+  });
+  assert.equal(response.status, 201);
+  const saved = await response.json();
+  const url = `/share/${saved.id}`;
+  const card = await send(url, "GET", undefined, {
+    Origin: "https://social.example",
+    "User-Agent": "facebookexternalhit/1.1",
+  });
+  assert.equal(card.status, 200);
+  assert.match(card.headers.get("content-type"), /text\/html/);
+  const html = await card.text();
+  assert.ok(
+    html.includes(
+      'property="og:title" content="Friends &quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt; &amp; family"',
+    ),
+  );
+  assert.ok(
+    html.includes(
+      `property="og:image" content="https://test.local${url}/image"`,
+    ),
+  );
+  assert.ok(html.includes('property="og:image:width" content="1200"'));
+  assert.ok(html.includes('name="twitter:card" content="summary_large_image"'));
+  assert.ok(html.includes("Themes: Custom photos."));
+  assert.ok(
+    !html.includes("Mywho") &&
+      !html.includes("Mbappé") &&
+      !html.includes("Macron"),
+  );
+  assert.ok(
+    !html.includes("<script>alert") && !html.includes(saved.deleteToken),
+  );
+  assert.ok(
+    html.includes(
+      `https://mikotokuroko.github.io/suika-the-politician/?game=${saved.id}`,
+    ),
+  );
+  assert.match(
+    card.headers.get("content-security-policy"),
+    /script-src 'nonce-/,
+  );
+  const image = await send(url + "/image");
+  assert.equal(image.headers.get("content-type"), "image/png");
+  assert.deepEqual(Buffer.from(await image.arrayBuffer()), previewBytes);
+  assert.equal(await (await send(url, "HEAD")).text(), "");
+  assert.equal(await (await send(url + "/image", "HEAD")).text(), "");
+  await send("/games/" + saved.id, "DELETE", undefined, {
+    Authorization: "Bearer " + saved.deleteToken,
+  });
+  assert.equal((await send(url)).status, 404);
+  assert.equal((await send(url + "/image")).status, 404);
+});
+
+test("legacy shares without a preview retain their data, deletion metadata and original expiry", async () => {
+  const id = "c".repeat(32);
+  const expiresAt = Math.floor(Date.now() / 1000) + 3600;
+  const legacy = {
+    ...game,
+    images: [fixtures.png, fixtures.png],
+    levels: 2,
+    themes: [],
+    expiresAt,
+  };
+  const namespace = await mf.getKVNamespace("GAMES");
+  await namespace.put(`games/${id}.json`, JSON.stringify(legacy), {
+    expiration: expiresAt,
+    metadata: { deleteHash: "preserved" },
+  });
+  assert.deepEqual(await (await send(`/games/${id}`)).json(), legacy);
+  assert.equal((await send(`/share/${id}`)).status, 200);
+  assert.equal(
+    (await send(`/share/${id}/image`)).headers.get("content-type"),
+    "image/png",
+  );
+  const entry = (await namespace.list({ prefix: `games/${id}` })).keys[0];
+  assert.equal(entry.expiration, expiresAt);
+  assert.equal(entry.metadata.deleteHash, "preserved");
+  assert.deepEqual(await (await send(`/games/${id}`)).json(), legacy);
+  const expiredId = "d".repeat(32);
+  await namespace.put(
+    `games/${expiredId}.json`,
+    JSON.stringify({ ...legacy, preview, expiresAt: 1 }),
+  );
+  assert.equal((await send(`/share/${expiredId}`)).status, 404);
+  assert.equal((await send(`/share/${expiredId}/image`)).status, 404);
+});
+
+test("preview validation rejects non-PNG, wrong dimensions and oversized images", async () => {
+  for (const invalid of [
+    fixtures.png,
+    fixtures.webp,
+    "data:image/svg+xml;base64,PHN2Zz4=",
+    "x".repeat(2000001),
+  ]) {
+    assert.equal(
+      (await send("/games", "POST", { ...game, preview: invalid })).status,
+      400,
+    );
   }
 });

@@ -4,6 +4,10 @@
   const t = window.i18n.t;
   const api = window.SHARING_API;
   let saving = false;
+  let previewMode = "selection";
+  let previewGameOver = false;
+  let previewRequest = 0;
+  let previewFrame = 0;
   function showExpiry(element, expiresAt) {
     if (!Number.isFinite(expiresAt)) return;
     element.dataset.expiresAt = expiresAt;
@@ -61,6 +65,7 @@
     label.append(checkbox, name);
     $("included-themes").append(label);
     checkbox.addEventListener("change", updateShare);
+    checkbox.addEventListener("change", schedulePreview);
   }
   for (const [key, name] of Object.entries(colorNames)) {
     const label = document.createElement("label");
@@ -114,6 +119,7 @@
     return response.status === 204 ? null : response.json();
   }
   function makeLink(id, token) {
+    if (!token) return `${api}/share/${id}`;
     const link = new URL(location.href);
     link.search = "";
     link.searchParams.set("game", id);
@@ -133,6 +139,9 @@
     updateShare();
     $("share-status").textContent = t("正在保存分享…");
     try {
+      game.preview = (await window.gamePreview.render(game)).toDataURL(
+        "image/png",
+      );
       const saved = await request("/games", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -170,6 +179,60 @@
     });
   }
   document.addEventListener("photoschange", updateShare);
+  async function renderPreview() {
+    const current = ++previewRequest;
+    if ($("custom-form").hidden) return;
+    try {
+      const canvas = await window.gamePreview.render(
+        {
+          title: $("game-title").value.trim() || t("我的合成游戏"),
+          images: window.themePicker.previewImages(),
+          themes: selectedThemes(),
+          palette: window.gamePalette.get(),
+        },
+        previewMode,
+        previewGameOver,
+      );
+      if (current !== previewRequest) return;
+      $("color-preview").getContext("2d").drawImage(canvas, 0, 0);
+      $("color-preview-status").textContent = "";
+    } catch {
+      if (current !== previewRequest) return;
+      $("color-preview").getContext("2d").clearRect(0, 0, 1200, 630);
+      $("color-preview-status").textContent = t("预览图片加载失败，请重试。");
+    }
+  }
+  function schedulePreview() {
+    cancelAnimationFrame(previewFrame);
+    previewFrame = requestAnimationFrame(renderPreview);
+  }
+  ["photoschange", "palettechange", "languagechange"].forEach((event) =>
+    document.addEventListener(event, schedulePreview),
+  );
+  $("game-title").addEventListener("input", schedulePreview);
+  $("customize").addEventListener("click", schedulePreview);
+  for (const mode of ["selection", "board"]) {
+    $(
+      mode === "selection" ? "preview-selection" : "preview-board",
+    ).addEventListener("click", () => {
+      previewMode = mode;
+      $("preview-selection").setAttribute(
+        "aria-pressed",
+        String(mode === "selection"),
+      );
+      $("preview-board").setAttribute("aria-pressed", String(mode === "board"));
+      $("preview-game-over").hidden = mode !== "board";
+      schedulePreview();
+    });
+  }
+  $("preview-game-over").addEventListener("click", () => {
+    previewGameOver = !previewGameOver;
+    $("preview-game-over").setAttribute(
+      "aria-pressed",
+      String(previewGameOver),
+    );
+    schedulePreview();
+  });
   if (!api)
     $("share-status").textContent = t("分享服务尚未配置，可先在本地预览。");
   updateShare();
@@ -207,6 +270,32 @@
       window.themePicker.showShared(game);
       showExpiry($("shared-expiry"), game.expiresAt);
       gameLoaded = true;
+      if (!$("copy-shared-link")) {
+        const copy = document.createElement("button");
+        copy.id = "copy-shared-link";
+        copy.type = "button";
+        copy.className = "secondary-button";
+        copy.dataset.i18n = "复制分享链接";
+        copy.textContent = t("复制分享链接");
+        copy.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(makeLink(id));
+            $("theme-status").textContent = t("链接已复制。");
+          } catch {
+            $("shared-link-fallback").hidden = false;
+            $("shared-link-fallback").focus();
+            $("shared-link-fallback").select();
+          }
+        });
+        const fallback = document.createElement("input");
+        fallback.id = "shared-link-fallback";
+        fallback.type = "url";
+        fallback.readOnly = true;
+        fallback.hidden = true;
+        fallback.value = makeLink(id);
+        fallback.setAttribute("aria-label", t("发送给朋友"));
+        $("shared-actions").append(copy, fallback);
+      }
       $("theme-status").textContent = "";
       if (deleteToken) $("delete-shared").hidden = false;
       $("retry-shared")?.remove();
@@ -238,6 +327,8 @@
       $("theme-screen").hidden = false;
       $("theme-selection").hidden = true;
       $("delete-shared").hidden = true;
+      $("copy-shared-link")?.remove();
+      $("shared-link-fallback")?.remove();
       $("shared-expiry").hidden = true;
       $("theme-status").textContent = t(
         "分享已删除。其他地区的缓存可能需要约一分钟更新。",
