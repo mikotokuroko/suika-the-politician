@@ -86,6 +86,7 @@
           </button>
         </div>
         <p id="theme-status" role="status"></p>
+        <p id="shared-expiry" hidden></p>
         <div id="shared-actions" hidden>
           <a class="secondary-button" href="./" data-i18n="制作自己的游戏"
             >制作自己的游戏</a
@@ -193,7 +194,11 @@
             </button>
           </div>
           <p id="share-status" role="status"></p>
+          <p data-i18n="分享将在 14 天后自动删除，包括上传的照片。">
+            分享将在 14 天后自动删除，包括上传的照片。
+          </p>
           <div id="share-result" class="creation-section" hidden>
+            <p id="share-expiry" hidden></p>
             <label for="share-link" data-i18n="发送给朋友">发送给朋友</label>
             <input id="share-link" type="url" readonly />
             <button

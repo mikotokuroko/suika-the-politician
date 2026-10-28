@@ -61,7 +61,10 @@ test("save, retrieve exact theme/palette, protect deletion and remove", async ()
   assert.match(saved.id, /^[a-f0-9]{32}$/);
   assert.match(saved.deleteToken, /^[a-f0-9]{64}$/);
   const loaded = await send("/games/" + saved.id);
-  assert.deepEqual(await loaded.json(), game);
+  assert.deepEqual(await loaded.json(), {
+    ...game,
+    expiresAt: saved.expiresAt,
+  });
   assert.equal(
     (
       await send("/games/" + saved.id, "DELETE", undefined, {
@@ -91,8 +94,11 @@ test("15 cropped images round-trip in PNG and WebP; wrong dimensions fail", asyn
     };
     const response = await send("/games", "POST", snapshot);
     assert.equal(response.status, 201);
-    const { id } = await response.json();
-    assert.deepEqual(await (await send("/games/" + id)).json(), snapshot);
+    const { id, expiresAt } = await response.json();
+    assert.deepEqual(await (await send("/games/" + id)).json(), {
+      ...snapshot,
+      expiresAt,
+    });
   }
   const bad = Buffer.from(fixtures.png.split(",")[1], "base64");
   bad.writeUInt32BE(10000, 16);
@@ -106,6 +112,28 @@ test("15 cropped images round-trip in PNG and WebP; wrong dimensions fail", asyn
       })
     ).status,
     400,
+  );
+});
+
+test("server assigns a fixed 14-day KV expiration that reads cannot extend", async () => {
+  const before = Math.floor(Date.now() / 1000);
+  const response = await send("/games", "POST", {
+    ...game,
+    expiresAt: 9999999999,
+  });
+  const saved = await response.json();
+  const after = Math.floor(Date.now() / 1000);
+  assert.ok(saved.expiresAt >= before + 14 * 86400);
+  assert.ok(saved.expiresAt <= after + 14 * 86400);
+  const namespace = await mf.getKVNamespace("GAMES");
+  const list = await namespace.list({ prefix: `games/${saved.id}` });
+  assert.equal(list.keys[0].expiration, saved.expiresAt);
+  assert.ok(list.keys[0].metadata.deleteHash);
+  const loaded = await (await send("/games/" + saved.id)).json();
+  assert.equal(loaded.expiresAt, saved.expiresAt);
+  assert.equal(
+    (await namespace.list({ prefix: `games/${saved.id}` })).keys[0].expiration,
+    saved.expiresAt,
   );
 });
 

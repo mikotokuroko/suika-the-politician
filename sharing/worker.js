@@ -1,5 +1,6 @@
 // Each creation is one KV value: its palette, theme choices and cropped images.
 const MAX_BODY = 8 * 1024 * 1024;
+const SHARE_LIFETIME_SECONDS = 14 * 24 * 60 * 60;
 const COLOR_KEYS = [
   "bg",
   "ink",
@@ -171,12 +172,14 @@ export default {
         )
           fail(429, "rate_limited");
         const game = validateGame(await boundedJson(request));
+        game.expiresAt = Math.floor(Date.now() / 1000) + SHARE_LIFETIME_SECONDS;
         const id = crypto.randomUUID().replaceAll("-", "");
         const deleteToken = hex(crypto.getRandomValues(new Uint8Array(32)));
         await env.GAMES.put(`games/${id}.json`, JSON.stringify(game), {
+          expiration: game.expiresAt,
           metadata: { deleteHash: hex(await hash(deleteToken)) },
         });
-        return json({ id, deleteToken }, 201);
+        return json({ id, deleteToken, expiresAt: game.expiresAt }, 201);
       }
       const match = path.match(/^\/games\/([a-f0-9]{32})$/);
       if (!match || !ID.test(match[1])) fail(404, "not_found");

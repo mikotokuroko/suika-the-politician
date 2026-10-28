@@ -79,8 +79,11 @@ The backend uses **Cloudflare Workers Free and Workers KV**, with no R2 subscrip
 Each creation is a single KV value with a hashed deletion token in private metadata.
 Photos are bounded to 15, uploads to 8 MiB, and requests are rate-limited. KV is
 eventually consistent: new links and deletions can take about a minute or longer
-to propagate between regions. Links have no automatic expiry, but remain dependent
-on the operator retaining the stored data. Free storage and request quotas apply;
+to propagate between regions. Shared games and their uploaded photos automatically
+expire 14 days after saving. Cloudflare KV deletes the entire record at expiry,
+freeing its storage without a scheduled job. The save result and shared-game screen
+show the server-assigned expiry date in the viewer's local time zone and language.
+Opening or playing a game does not extend its expiry. Free storage and request quotas apply;
 when exhausted, sharing operations fail instead of automatically upgrading the plan.
 See [KV pricing](https://developers.cloudflare.com/kv/platform/pricing/).
 

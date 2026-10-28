@@ -1,4 +1,16 @@
 const TRANSLATIONS = {
+  "分享将在 14 天后自动删除，包括上传的照片。": {
+    en: "Shared games and uploaded photos are automatically deleted after 14 days.",
+    fr: "Les jeux partagés et les photos envoyées sont automatiquement supprimés après 14 jours.",
+  },
+  "到期时间：{date}。届时游戏及照片将自动删除。": {
+    en: "Expires: {date}. The game and photos will be deleted automatically.",
+    fr: "Expiration : {date}. Le jeu et les photos seront supprimés automatiquement.",
+  },
+  "分享已过期、已删除、不存在或尚未同步。新链接请稍后重试。": {
+    en: "This share has expired, was deleted, is missing, or is still syncing. For a new link, retry shortly.",
+    fr: "Ce partage a expiré, a été supprimé, est introuvable ou est en cours de synchronisation. Pour un nouveau lien, réessayez bientôt.",
+  },
   "每个等级对应一张照片。点击保存分享才会上传裁剪后的照片，拥有链接的人都可以查看。":
     {
       en: "One photo per level. Cropped photos are uploaded only when you save and share. Anyone with the link can view them.",

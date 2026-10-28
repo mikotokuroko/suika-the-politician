@@ -4,6 +4,30 @@
   const t = window.i18n.t;
   const api = window.SHARING_API;
   let saving = false;
+  function showExpiry(element, expiresAt) {
+    if (!Number.isFinite(expiresAt)) return;
+    element.dataset.expiresAt = expiresAt;
+    element.hidden = false;
+    const date = new Date(expiresAt * 1000);
+    const formatted = new Intl.DateTimeFormat(document.documentElement.lang, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short",
+    }).format(date);
+    element.textContent = t("到期时间：{date}。届时游戏及照片将自动删除。", {
+      date: formatted,
+    });
+  }
+  document.addEventListener("languagechange", () => {
+    document
+      .querySelectorAll("[data-expires-at]")
+      .forEach((element) =>
+        showExpiry(element, Number(element.dataset.expiresAt)),
+      );
+  });
   const colorNames = {
     bg: "页面背景",
     ink: "主要文字",
@@ -68,7 +92,7 @@
   }
   function errorMessage(error) {
     if (error.code === "not_found")
-      return t("分享不存在、已删除或尚未同步。新链接请稍后重试。");
+      return t("分享已过期、已删除、不存在或尚未同步。新链接请稍后重试。");
     if (error.code === "rate_limited")
       return t("保存过于频繁，请一分钟后重试。");
     if (error.code === "too_large")
@@ -117,6 +141,7 @@
       $("share-link").value = makeLink(saved.id);
       $("delete-link").value = makeLink(saved.id, saved.deleteToken);
       $("share-result").hidden = false;
+      showExpiry($("share-expiry"), saved.expiresAt);
       $("share-status").textContent = t(
         "分享已保存。新链接可能需要约一分钟才能在其他地区打开。",
       );
@@ -180,6 +205,7 @@
         throw new Error("Invalid game");
       window.gamePalette.set(game.palette);
       window.themePicker.showShared(game);
+      showExpiry($("shared-expiry"), game.expiresAt);
       gameLoaded = true;
       $("theme-status").textContent = "";
       if (deleteToken) $("delete-shared").hidden = false;
@@ -212,6 +238,7 @@
       $("theme-screen").hidden = false;
       $("theme-selection").hidden = true;
       $("delete-shared").hidden = true;
+      $("shared-expiry").hidden = true;
       $("theme-status").textContent = t(
         "分享已删除。其他地区的缓存可能需要约一分钟更新。",
       );
