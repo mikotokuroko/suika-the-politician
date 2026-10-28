@@ -222,7 +222,7 @@ async function shareResponse(request, env, id, imageOnly, headers) {
   const safeShareUrl = escapeHtml(shareUrl);
   const imageType = "image/png";
   const dimensions =
-    '<meta property="og:image:width" content="1456"><meta property="og:image:height" content="730">';
+    '<meta property="og:image:width" content="1222"><meta property="og:image:height" content="864">';
   const html = `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${title}</title><meta name="description" content="${description}">
@@ -231,12 +231,12 @@ async function shareResponse(request, env, id, imageOnly, headers) {
 <meta property="og:title" content="${title}"><meta property="og:description" content="${description}">
 <meta property="og:url" content="${safeShareUrl}"><meta property="og:image" content="${safeImageUrl}">
 <meta property="og:image:type" content="${imageType}">${dimensions}
-<meta property="og:image:alt" content="Suika the Politician theme selection">
+<meta property="og:image:alt" content="Suika the Politician cover photo">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${title}">
 <meta name="twitter:description" content="${description}"><meta name="twitter:image" content="${safeImageUrl}">
-<meta name="twitter:image:alt" content="Suika the Politician theme selection">
+<meta name="twitter:image:alt" content="Suika the Politician cover photo">
 <style>body{margin:0;padding:24px;background:#171717;color:#fff;font:18px/1.5 system-ui;text-align:center}main{max-width:900px;margin:auto}img{max-width:100%;border-radius:16px}a{display:inline-block;padding:12px 24px;background:#fff;color:#171717;border-radius:12px}</style>
-</head><body><main><h1>${title}</h1><img src="${safeImageUrl}" alt="Suika the Politician theme selection"><p><a href="${playUrl}">Play on GitHub Pages</a></p></main>
+</head><body><main><h1>${title}</h1><img src="${safeImageUrl}" alt="Suika the Politician cover photo"><p><a href="${playUrl}">Play on GitHub Pages</a></p></main>
 <script nonce="${nonce}">location.replace(${JSON.stringify(playUrl)});</script></body></html>`;
   return new Response(request.method === "HEAD" ? null : html, {
     headers: {

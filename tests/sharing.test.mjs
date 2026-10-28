@@ -243,7 +243,7 @@ test("social crawlers receive escaped metadata and the standard preview even wit
       'property="og:image" content="https://mikotokuroko.github.io/suika-the-politician/preview.png"',
     ),
   );
-  assert.ok(html.includes('property="og:image:width" content="1456"'));
+  assert.ok(html.includes('property="og:image:width" content="1222"'));
   assert.ok(html.includes('name="twitter:card" content="summary_large_image"'));
   assert.ok(html.includes("Themes: Custom photos."));
   assert.ok(

@@ -1,6 +1,6 @@
 # 合成大仇人
 
-![Suika the Politician theme selection](preview.png)
+![Suika the Politician cover photo](preview.png)
 
 ## Run locally
 
@@ -70,7 +70,7 @@ are not uploaded. Uncheck all default themes for a custom-photos-only game, or
 share selected default themes with a palette even without uploading photos.
 
 Share links use `https://mikotokuroko.github.io/suika-the-politician/?game=<ID>`.
-All links use the standard `preview.png` theme-selection image for social previews.
+All links use the standard `preview.png` cover image for social previews.
 Older Cloudflare `/share/<ID>` links remain playable and use the same standard
 preview; their image endpoint redirects to `preview.png`. Messaging apps may
 retain cached cards for previously shared links.
