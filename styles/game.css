@@ -3,6 +3,11 @@
   --ink: #f2cf4a;
   --red: #7a1812;
   --soft: #e8d58a;
+  --border: #d7a55d;
+  --button: #f2cf4a;
+  --buttonText: #7a1812;
+  --overlay: #a3231b;
+  --focus: #ffffff;
 }
 * {
   box-sizing: border-box;
@@ -12,7 +17,7 @@ html,
 body {
   margin: 0;
   height: 100%;
-  background: #a3231b;
+  background: var(--bg);
   color: var(--ink);
   overflow: hidden;
   font-family:
@@ -65,7 +70,7 @@ body {
 .restart-button {
   border: 0;
   background: var(--red);
-  color: #f2cf4a;
+  color: var(--ink);
   font: inherit;
   font-size: 15px;
   padding: 8px 18px;
@@ -93,7 +98,7 @@ canvas {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: rgba(163, 35, 27, 0.92);
+  background: color-mix(in srgb, var(--overlay) 92%, transparent);
   border-radius: 10px;
   line-height: 1.3;
   text-align: center;
@@ -113,7 +118,7 @@ canvas {
   margin-top: 6px;
   border: 0;
   background: var(--red);
-  color: #f2cf4a;
+  color: var(--ink);
   font: inherit;
   font-size: 18px;
   padding: 10px 28px;
@@ -126,8 +131,8 @@ canvas {
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: #a3231b;
-  color: #f2cf4a;
+  background: var(--bg);
+  color: var(--ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -173,7 +178,7 @@ canvas {
   text-align: left;
   align-items: center;
   padding: 18px;
-  border: 1px solid #d7a55d;
+  border: 1px solid var(--border);
   border-radius: 18px;
   background: var(--red);
   color: var(--ink);
@@ -197,7 +202,7 @@ canvas {
 .primary-button,
 .crop-actions button,
 .photo-list button {
-  border: 1px solid #d7a55d;
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 14px;
   background: var(--red);
@@ -206,8 +211,8 @@ canvas {
   cursor: pointer;
 }
 .primary-button {
-  background: var(--ink);
-  color: var(--red);
+  background: var(--button);
+  color: var(--buttonText);
   font-weight: bold;
 }
 button:disabled {
@@ -216,7 +221,7 @@ button:disabled {
 }
 button:focus-visible,
 input:focus-visible {
-  outline: 3px solid #fff;
+  outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
 .theme-panel label,
@@ -244,7 +249,7 @@ input:focus-visible {
   gap: 6px;
   flex-wrap: wrap;
   padding: 10px;
-  border: 1px solid #d7a55d;
+  border: 1px solid var(--border);
   border-radius: 12px;
 }
 .photo-list img {
@@ -269,14 +274,14 @@ input:focus-visible {
   touch-action: pan-y;
 }
 .crop-dialog::backdrop {
-  background: #000b;
+  background: color-mix(in srgb, var(--overlay) 75%, transparent);
 }
 .crop-dialog canvas {
   width: min(100%, 320px);
   height: auto;
   margin: auto;
   border-radius: 50%;
-  background: #331a16;
+  background: var(--red);
 }
 .crop-dialog input {
   width: 100%;
@@ -399,7 +404,7 @@ input:focus-visible {
   cursor: pointer;
 }
 .photo-upload:focus-within {
-  outline: 3px solid #fff;
+  outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
 .photo-upload:has(input:disabled) {
@@ -428,4 +433,91 @@ input:focus-visible {
 .level-crop-button:hover {
   background: var(--red);
   border-color: var(--soft);
+}
+.level-crop-button:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.creation-section {
+  min-width: 0;
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.creation-section legend {
+  padding: 0 8px;
+  font-size: 20px;
+}
+.theme-checks,
+.creation-actions,
+#shared-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.theme-checks label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--red);
+}
+.theme-checks input {
+  accent-color: var(--button);
+  width: 20px;
+  height: 20px;
+}
+.palette-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.palette-controls label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 14px;
+}
+.palette-controls input[type="color"] {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  padding: 2px;
+  background: var(--red);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.theme-panel input[type="text"],
+.theme-panel input[type="url"] {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--red);
+  color: var(--ink);
+  user-select: text;
+  -webkit-user-select: text;
+}
+#share-result input {
+  margin-bottom: 10px;
+}
+a.secondary-button {
+  display: inline-block;
+  text-decoration: none;
+}
+a:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+@media (max-width: 360px) {
+  .palette-controls {
+    grid-template-columns: 1fr;
+  }
 }

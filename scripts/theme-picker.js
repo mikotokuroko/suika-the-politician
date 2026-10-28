@@ -8,6 +8,7 @@
   let selectedTheme = null;
   let previewImages = [];
   let previewRequest = 0;
+  let sharedMode = false;
   let savedCrops = {};
   try {
     const stored = JSON.parse(
@@ -32,7 +33,9 @@
     }
   } catch {}
   const themeCrop = (theme, index) =>
-    savedCrops[theme.sources[index]] || theme.crops?.[index] || defaults();
+    (theme.shared ? null : savedCrops[theme.sources[index]]) ||
+    theme.crops?.[index] ||
+    defaults();
 
   function openCrop(photo) {
     editing = photo;
@@ -81,7 +84,7 @@
     context.beginPath();
     context.arc(160, 160, 160, 0, Math.PI * 2);
     context.clip();
-    context.fillStyle = "#7a1812";
+    context.fillStyle = window.gamePalette.get().red;
     context.fillRect(0, 0, 320, 320);
     context.drawImage(image, x, y, side, side, 0, 0, 320, 320);
     context.restore();
@@ -98,6 +101,7 @@
     $("play-custom").disabled =
       busy || !validCount() || photos.length !== levelCount();
     $("photo-files").disabled = busy;
+    document.dispatchEvent(new Event("photoschange"));
     document
       .querySelectorAll(".theme-card, #customize")
       .forEach((button) => (button.disabled = busy));
@@ -191,14 +195,16 @@
     $("choose-theme").focus();
   }
 
-  window.BUILT_IN_THEMES.forEach((theme) => {
+  function addThemeCard(theme) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "theme-card";
     const preview = document.createElement("img");
     loadImage(theme.sources[0])
       .then((image) => {
-        preview.src = crop(image, themeCrop(theme, 0)).toDataURL();
+        preview.src = theme.preCropped
+          ? theme.sources[0]
+          : crop(image, themeCrop(theme, 0)).toDataURL();
       })
       .catch(() => {
         preview.src = theme.sources[0];
@@ -232,12 +238,12 @@
         const images = await Promise.all(theme.sources.map(loadImage));
         if (request !== previewRequest) return;
         previewImages = images.map((image, index) =>
-          crop(image, themeCrop(theme, index)),
+          theme.preCropped ? image : crop(image, themeCrop(theme, index)),
         );
         previewImages.forEach((canvas, index) => {
           const item = document.createElement("li");
           const image = document.createElement("img");
-          image.src = canvas.toDataURL();
+          image.src = theme.preCropped ? canvas.src : canvas.toDataURL();
           image.alt = t("等级 {n}", { n: index + 1 });
           image.dataset.previewLevel = index + 1;
           const number = document.createElement("span");
@@ -252,6 +258,7 @@
             t("重新裁剪等级 {n}", { n: index + 1 }),
           );
           edit.append(image, number);
+          edit.disabled = !!theme.shared;
           edit.addEventListener("click", () =>
             openCrop({
               image: images[index],
@@ -291,7 +298,8 @@
       }
     });
     $("theme-options").append(button);
-  });
+  }
+  window.BUILT_IN_THEMES.forEach(addThemeCard);
 
   $("preview-back").addEventListener("click", () => {
     previewRequest++;
@@ -300,7 +308,7 @@
     $("level-screen").hidden = true;
     $("theme-screen").hidden = false;
     const index = window.BUILT_IN_THEMES.indexOf(selectedTheme);
-    $("theme-options").children[index]?.focus();
+    $("theme-options").children[Math.max(0, index)]?.focus();
   });
   $("preview-play").addEventListener("click", () => {
     if (!busy && previewImages.length) start(previewImages);
@@ -308,8 +316,14 @@
 
   $("customize").addEventListener("click", () => {
     $("custom-form").hidden = false;
+    $("theme-selection").hidden = true;
     $("level-count").focus();
     updateStatus();
+  });
+  $("custom-back").addEventListener("click", () => {
+    $("custom-form").hidden = true;
+    $("theme-selection").hidden = false;
+    $("customize").focus();
   });
   $("level-count").addEventListener("input", updateStatus);
   $("photo-files").addEventListener("change", async (event) => {
@@ -372,7 +386,8 @@
     window.mergeGame.pause();
     $("app").hidden = true;
     $("theme-screen").hidden = false;
-    $("customize").focus();
+    if (sharedMode) document.querySelector("#theme-options button")?.focus();
+    else $("customize").focus();
   });
   document.addEventListener("languagechange", () => {
     document
@@ -396,5 +411,48 @@
     if (busy) $("theme-status").textContent = t("正在加载主题…");
     else $("theme-status").textContent = "";
   });
+  window.themePicker = {
+    count() {
+      return photos.length;
+    },
+    snapshot() {
+      return {
+        images: photos.map((photo) =>
+          photo.cropped.toDataURL("image/webp", 0.85),
+        ),
+        levels: photos.length,
+      };
+    },
+    canShare() {
+      return (
+        !busy &&
+        (photos.length === 0 ||
+          (validCount() && photos.length === levelCount()))
+      );
+    },
+    showShared(game) {
+      sharedMode = true;
+      $("custom-form").hidden = true;
+      $("customize").hidden = true;
+      $("theme-selection").hidden = false;
+      $("theme-options").replaceChildren();
+      $("theme-heading").removeAttribute("data-i18n");
+      $("theme-heading").textContent = game.title;
+      document.querySelector(
+        "#level-screen p[data-i18n='点击任意图片调整裁剪。修改仅保存在此浏览器。']",
+      ).hidden = true;
+      if (game.images.length)
+        addThemeCard({
+          id: "custom",
+          name: "自定义照片",
+          sources: game.images,
+          shared: true,
+          preCropped: true,
+        });
+      window.BUILT_IN_THEMES.filter((theme) =>
+        game.themes.includes(theme.id),
+      ).forEach((theme) => addThemeCard({ ...theme, shared: true }));
+    },
+  };
   updateStatus();
 })();

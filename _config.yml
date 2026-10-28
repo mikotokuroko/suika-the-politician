@@ -1,0 +1,6 @@
+exclude:
+  - sharing
+  - tests
+  - node_modules
+  - package.json
+  - package-lock.json

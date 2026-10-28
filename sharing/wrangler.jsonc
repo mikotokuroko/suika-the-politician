@@ -1,0 +1,29 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "suika-sharing",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-28",
+  "account_id": "7d8da37df27ca5bb51fd9b92c43d899f",
+  "workers_dev": true,
+  "kv_namespaces": [
+    { "binding": "GAMES", "id": "756ae598fc194dc9afb95842c4d4a3fa" },
+  ],
+  "vars": { "ALLOWED_ORIGIN": "https://mikotokuroko.github.io" },
+  "ratelimits": [
+    {
+      "name": "CREATE_LIMIT",
+      "namespace_id": "1001",
+      "simple": { "limit": 3, "period": 60 },
+    },
+    {
+      "name": "GLOBAL_LIMIT",
+      "namespace_id": "1002",
+      "simple": { "limit": 30, "period": 60 },
+    },
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1,
+    "traces": { "enabled": true, "head_sampling_rate": 0.1 },
+  },
+}

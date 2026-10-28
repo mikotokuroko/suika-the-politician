@@ -352,6 +352,12 @@
     effects = effects.filter((f) => f.t < 0.35);
   }
 
+  let palette = window.gamePalette.get();
+  document.addEventListener("palettechange", () => {
+    palette = window.gamePalette.get();
+    draw.bg = null;
+  });
+
   function drawBall(lv, x, y, a, scale) {
     const r = R[lv] * scale;
     ctx.save();
@@ -361,7 +367,7 @@
     ctx.restore();
     ctx.beginPath();
     ctx.arc(x, y, r - 0.5, 0, 6.2832);
-    ctx.strokeStyle = "rgba(255,255,255,.85)";
+    ctx.strokeStyle = palette.ballBorder + "d9";
     ctx.lineWidth = 2;
     ctx.stroke();
   }
@@ -374,8 +380,8 @@
     ctx.imageSmoothingQuality = "high";
     if (!draw.bg) {
       const g = ctx.createLinearGradient(0, 0, 0, H);
-      g.addColorStop(0, "#a92a21");
-      g.addColorStop(1, "#8f1d17");
+      g.addColorStop(0, palette.boardTop);
+      g.addColorStop(1, palette.boardBottom);
       draw.bg = g;
     }
     ctx.fillStyle = draw.bg;
@@ -384,7 +390,7 @@
     const blink = update.danger && Math.floor(now / 180) % 2 === 0;
     ctx.setLineDash([10, 8]);
     ctx.lineWidth = 2;
-    ctx.strokeStyle = blink ? "#f2cf4a" : "rgba(242,207,74,.6)";
+    ctx.strokeStyle = blink ? palette.guide : palette.guide + "99";
     ctx.beginPath();
     ctx.moveTo(0, LINE);
     ctx.lineTo(W, LINE);
@@ -395,7 +401,7 @@
       const r = R[heldLv],
         x = clamp(aimX, r + 2, W - r - 2);
       ctx.setLineDash([4, 8]);
-      ctx.strokeStyle = "rgba(242,207,74,.4)";
+      ctx.strokeStyle = palette.guide + "66";
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(x, DROP_Y + r);
@@ -411,7 +417,11 @@
       const p = f.t / 0.35;
       ctx.beginPath();
       ctx.arc(f.x, f.y, f.r * (1 + p * 0.7), 0, 6.2832);
-      ctx.strokeStyle = "rgba(242,207,74," + 0.7 * (1 - p) + ")";
+      ctx.strokeStyle =
+        palette.effect +
+        Math.round(255 * 0.7 * (1 - p))
+          .toString(16)
+          .padStart(2, "0");
       ctx.lineWidth = 4 * (1 - p) + 1;
       ctx.stroke();
     }

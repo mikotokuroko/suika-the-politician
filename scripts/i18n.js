@@ -1,4 +1,103 @@
 const TRANSLATIONS = {
+  "每个等级对应一张照片。点击保存分享才会上传裁剪后的照片，拥有链接的人都可以查看。":
+    {
+      en: "One photo per level. Cropped photos are uploaded only when you save and share. Anyone with the link can view them.",
+      fr: "Une photo par niveau. Les photos recadrées sont envoyées uniquement lors du partage. Toute personne disposant du lien peut les voir.",
+    },
+  制作自己的游戏: { en: "Create your own game", fr: "Créer votre jeu" },
+  删除此分享: { en: "Delete this shared game", fr: "Supprimer ce jeu partagé" },
+  游戏名称: { en: "Game name", fr: "Nom du jeu" },
+  分享中包含的默认主题: {
+    en: "Default themes to include",
+    fr: "Thèmes intégrés à inclure",
+  },
+  "全部取消勾选，朋友将只看到你的照片主题。": {
+    en: "Uncheck all to share only your photo theme.",
+    fr: "Décochez tout pour partager uniquement votre thème photo.",
+  },
+  游戏配色: { en: "Game colors", fr: "Couleurs du jeu" },
+  "颜色会立即应用，游戏预览也会使用这些颜色。": {
+    en: "Colors update immediately and carry into your game preview.",
+    fr: "Les couleurs sont appliquées immédiatement, y compris dans l’aperçu du jeu.",
+  },
+  恢复默认配色: { en: "Reset colors", fr: "Réinitialiser les couleurs" },
+  保存并分享: { en: "Save and share", fr: "Enregistrer et partager" },
+  发送给朋友: { en: "Send to friends", fr: "Envoyer aux amis" },
+  复制链接: { en: "Copy link", fr: "Copier le lien" },
+  "私人删除链接（请保存，不要分享）": {
+    en: "Private delete link (keep it; do not share)",
+    fr: "Lien privé de suppression (à conserver, ne pas partager)",
+  },
+  复制删除链接: { en: "Copy delete link", fr: "Copier le lien de suppression" },
+  "链接保存的是当前版本。修改后再次分享会生成新的链接。": {
+    en: "This link preserves the saved version. Sharing after edits creates a new link.",
+    fr: "Ce lien conserve la version enregistrée. Un nouveau partage après modification crée un autre lien.",
+  },
+  自定义照片: { en: "Custom photos", fr: "Photos personnalisées" },
+  我的合成游戏: { en: "My merge game", fr: "Mon jeu de fusion" },
+  页面背景: { en: "Page background", fr: "Fond de page" },
+  主要文字: { en: "Main text", fr: "Texte principal" },
+  面板背景: { en: "Panel background", fr: "Fond des panneaux" },
+  次要文字: { en: "Secondary text", fr: "Texte secondaire" },
+  边框: { en: "Borders", fr: "Bordures" },
+  主要按钮: { en: "Primary buttons", fr: "Boutons principaux" },
+  按钮文字: { en: "Button text", fr: "Texte des boutons" },
+  游戏背景顶部: { en: "Board top", fr: "Haut du plateau" },
+  游戏背景底部: { en: "Board bottom", fr: "Bas du plateau" },
+  照片圆框: { en: "Photo outlines", fr: "Contour des photos" },
+  投放与警戒线: {
+    en: "Aim and limit lines",
+    fr: "Lignes de visée et de limite",
+  },
+  合成效果: { en: "Merge effects", fr: "Effets de fusion" },
+  结束画面背景: { en: "Game-over background", fr: "Fond de fin de partie" },
+  焦点高亮: { en: "Focus highlight", fr: "Indicateur de sélection" },
+  "分享不存在、已删除或尚未同步。新链接请稍后重试。": {
+    en: "This share is missing, deleted, or still syncing. For a new link, retry shortly.",
+    fr: "Ce partage est introuvable, supprimé ou en cours de synchronisation. Réessayez bientôt.",
+  },
+  "保存过于频繁，请一分钟后重试。": {
+    en: "Too many saves. Try again in a minute.",
+    fr: "Trop de sauvegardes. Réessayez dans une minute.",
+  },
+  "图片总大小超出限制，请减少照片后重试。": {
+    en: "The photos exceed the size limit. Remove some photos and retry.",
+    fr: "Les photos dépassent la taille maximale. Supprimez-en et réessayez.",
+  },
+  "暂时无法连接分享服务。请稍后重试，你的照片仍在此页面。": {
+    en: "Sharing is temporarily unavailable. Retry shortly; your photos are still on this page.",
+    fr: "Le partage est temporairement indisponible. Réessayez bientôt ; vos photos sont toujours sur cette page.",
+  },
+  "正在保存分享…": {
+    en: "Saving your shared game…",
+    fr: "Enregistrement du jeu partagé…",
+  },
+  "分享已保存。新链接可能需要约一分钟才能在其他地区打开。": {
+    en: "Saved. New links may take about a minute to become available in other regions.",
+    fr: "Enregistré. Le lien peut prendre environ une minute avant de fonctionner dans les autres régions.",
+  },
+  "链接已复制。": { en: "Link copied.", fr: "Lien copié." },
+  "请选择并复制链接。": {
+    en: "Select and copy the link.",
+    fr: "Sélectionnez et copiez le lien.",
+  },
+  "分享服务尚未配置，可先在本地预览。": {
+    en: "Sharing is not configured yet. You can preview locally.",
+    fr: "Le partage n’est pas encore configuré. Vous pouvez prévisualiser en local.",
+  },
+  "正在加载分享…": {
+    en: "Loading shared game…",
+    fr: "Chargement du jeu partagé…",
+  },
+  重试: { en: "Retry", fr: "Réessayer" },
+  "确定删除此分享？朋友将无法再打开它。": {
+    en: "Delete this shared game? Friends will no longer be able to open it.",
+    fr: "Supprimer ce jeu partagé ? Vos amis ne pourront plus l’ouvrir.",
+  },
+  "分享已删除。其他地区的缓存可能需要约一分钟更新。": {
+    en: "Deleted. Cached copies in other regions may take about a minute to update.",
+    fr: "Supprimé. Les copies en cache dans les autres régions peuvent prendre environ une minute à se mettre à jour.",
+  },
   "点击任意图片调整裁剪。修改仅保存在此浏览器。": {
     en: "Click any image to adjust its crop. Changes are saved only in this browser.",
     fr: "Cliquez sur une image pour la recadrer. Les modifications sont enregistrées uniquement dans ce navigateur.",

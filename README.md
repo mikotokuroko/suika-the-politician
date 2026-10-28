@@ -23,6 +23,9 @@ access when location cannot be determined.
 - `assets/images/`: original, Mbappé, and Macron theme images.
 - `scripts/themes.js`: built-in theme names and image order.
 - `scripts/theme-picker.js`: theme selection, local photo upload, and circular cropping.
+- `scripts/palette.js`: shared color settings for the interface and game canvas.
+- `scripts/sharing.js`: creation, public game links, and private deletion links.
+- `sharing/worker.js`: Cloudflare Workers API with KV storage.
 
 Built-in image order is explicit in `scripts/themes.js`; edit that list to change the progression. Radii adapt to the number of levels. Scores remain stored
 under the `xigua_best` local storage key. Cloudflare Web Analytics measures visits,
@@ -33,7 +36,7 @@ the `/suika-the-politician/` path to view this game.
 
 ## Deploy
 
-Publish the entire repository as a static site, keeping the directory structure.
+Push `main` to deploy the static site on GitHub Pages, keeping the directory structure.
 The page now requires its `styles`, `scripts`, and `assets` directories; uploading
 only `index.html` is insufficient.
 
@@ -51,11 +54,57 @@ Use the crop controls to adjust zoom and horizontal/vertical position; reorder o
 remove photos before starting. Adding more files appends them to the current set.
 The start button enables only when the photo count matches the level count.
 
-Images are processed locally and retained only for the current page session. Reloading
-clears custom photos. Returning to theme selection preserves them; selecting a theme
+Unshared images are processed locally and retained only for the current page session. Reloading
+clears the draft. Returning to theme selection preserves it; selecting a theme
 starts a new game. Uploads are downscaled to a maximum dimension of 1600 pixels, and
 game sprites are 320-pixel circles. Use browser-supported image formats such as PNG,
 JPEG, or WebP.
+
+## Shared games
+
+Choose **Save and share** to upload only the 320-pixel circular crops and save the
+game name, level order, selected default themes, and 14 color settings. Crops use
+compressed WebP (PNG fallback) to conserve the free storage allowance. Originals
+are not uploaded. Uncheck all default themes for a custom-photos-only game, or
+share selected default themes with a palette even without uploading photos.
+
+The returned GitHub Pages URL contains a random game ID. Anyone with the link can
+view its photos and play. Each save creates a separate snapshot; editing your draft
+does not change an earlier link. Keep the separate private deletion link: there is
+no account or password recovery for it. Opening that link does not delete anything;
+the creator must use the delete button and confirm. Deletion cannot retract photos
+someone has already downloaded.
+
+The backend uses **Cloudflare Workers Free and Workers KV**, with no R2 subscription.
+Each creation is a single KV value with a hashed deletion token in private metadata.
+Photos are bounded to 15, uploads to 8 MiB, and requests are rate-limited. KV is
+eventually consistent: new links and deletions can take about a minute or longer
+to propagate between regions. Links have no automatic expiry, but remain dependent
+on the operator retaining the stored data. Free storage and request quotas apply;
+when exhausted, sharing operations fail instead of automatically upgrading the plan.
+See [KV pricing](https://developers.cloudflare.com/kv/platform/pricing/).
+
+### Backend development and deployment
+
+```sh
+npm ci
+npm test
+npm run dev:sharing
+```
+
+Serve the frontend on `http://localhost:8080` and temporarily set `SHARING_API` in
+`scripts/sharing-config.js` to `http://localhost:8787` for local development.
+Local Wrangler uses simulated KV, not production data. Restore the production API
+URL before pushing. To deploy backend changes to the configured Cloudflare account:
+
+```sh
+npm run deploy:sharing
+```
+
+The namespace ID and allowed frontend origin are in `sharing/wrangler.jsonc`.
+Keep credentials out of browser code and Git. GitHub Pages excludes the backend,
+dependencies, and tests using `_config.yml`. Backend changes require a separate
+Worker deployment; pushing to GitHub only deploys the frontend.
 
 ## Languages and portrait framing
 

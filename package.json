@@ -1,0 +1,16 @@
+{
+  "name": "suika-the-politician",
+  "version": "1.0.0",
+  "description": "Customizable photo merge game with free Cloudflare sharing",
+  "scripts": {
+    "dev:sharing": "wrangler dev --config sharing/wrangler.jsonc --var ALLOWED_ORIGIN:http://localhost:8080",
+    "deploy:sharing": "wrangler deploy --config sharing/wrangler.jsonc",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "type": "commonjs",
+  "devDependencies": {
+    "miniflare": "5.20261023.1-beta",
+    "wrangler": "4.154.0"
+  },
+  "private": true
+}

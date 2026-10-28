@@ -70,26 +70,51 @@
             <option value="en">English</option>
           </select></label
         >
-        <p class="eyebrow" data-i18n="合成大迈乎">合成大迈乎</p>
-        <h1 id="theme-heading" data-i18n="选择你的合成主题">
-          选择你的合成主题
-        </h1>
-        <div id="theme-options" class="theme-options"></div>
-        <button
-          type="button"
-          id="customize"
-          class="primary-button"
-          data-i18n="＋ 自定义照片主题"
-        >
-          ＋ 自定义照片主题
-        </button>
-        <p id="theme-status" role="status"></p>
-        <form id="custom-form" hidden>
-          <h2 data-i18n="制作你的主题">制作你的主题</h2>
-          <p
-            data-i18n="每个等级对应一张照片，按从小到大排列。照片仅在本浏览器中处理，本次打开期间保留。"
+        <div id="theme-selection">
+          <p class="eyebrow" data-i18n="合成大迈乎">合成大迈乎</p>
+          <h1 id="theme-heading" data-i18n="选择你的合成主题">
+            选择你的合成主题
+          </h1>
+          <div id="theme-options" class="theme-options"></div>
+          <button
+            type="button"
+            id="customize"
+            class="primary-button"
+            data-i18n="＋ 自定义照片主题"
           >
-            每个等级对应一张照片，按从小到大排列。照片仅在本浏览器中处理，本次打开期间保留。
+            ＋ 自定义照片主题
+          </button>
+        </div>
+        <p id="theme-status" role="status"></p>
+        <div id="shared-actions" hidden>
+          <a class="secondary-button" href="./" data-i18n="制作自己的游戏"
+            >制作自己的游戏</a
+          ><button
+            id="delete-shared"
+            class="secondary-button"
+            type="button"
+            hidden
+            data-i18n="删除此分享"
+          >
+            删除此分享
+          </button>
+        </div>
+        <form id="custom-form" hidden>
+          <button
+            type="button"
+            id="custom-back"
+            class="secondary-button"
+            data-i18n="返回主题"
+          >
+            返回主题
+          </button>
+          <h2 data-i18n="制作你的主题">制作你的主题</h2>
+          <label for="game-title" data-i18n="游戏名称">游戏名称</label>
+          <input id="game-title" type="text" maxlength="80" />
+          <p
+            data-i18n="每个等级对应一张照片。点击保存分享才会上传裁剪后的照片，拥有链接的人都可以查看。"
+          >
+            每个等级对应一张照片。点击保存分享才会上传裁剪后的照片，拥有链接的人都可以查看。
           </p>
           <label for="level-count" data-i18n="等级数量（2–15）"
             >等级数量（2–15）</label
@@ -123,15 +148,80 @@
           </div>
           <p id="photo-status" role="status"></p>
           <ol id="photo-list" class="photo-list"></ol>
-          <button
-            id="play-custom"
-            class="primary-button"
-            type="submit"
-            disabled
-            data-i18n="使用这个主题开始"
-          >
-            使用这个主题开始
-          </button>
+          <fieldset class="creation-section">
+            <legend data-i18n="分享中包含的默认主题">
+              分享中包含的默认主题
+            </legend>
+            <p data-i18n="全部取消勾选，朋友将只看到你的照片主题。">
+              全部取消勾选，朋友将只看到你的照片主题。
+            </p>
+            <div id="included-themes" class="theme-checks"></div>
+          </fieldset>
+          <fieldset class="creation-section">
+            <legend data-i18n="游戏配色">游戏配色</legend>
+            <p data-i18n="颜色会立即应用，游戏预览也会使用这些颜色。">
+              颜色会立即应用，游戏预览也会使用这些颜色。
+            </p>
+            <div id="palette-controls" class="palette-controls"></div>
+            <button
+              id="reset-palette"
+              type="button"
+              class="secondary-button"
+              data-i18n="恢复默认配色"
+            >
+              恢复默认配色
+            </button>
+          </fieldset>
+          <div class="creation-actions">
+            <button
+              id="play-custom"
+              class="primary-button"
+              type="submit"
+              disabled
+              data-i18n="使用这个主题开始"
+            >
+              使用这个主题开始
+            </button>
+            <button
+              id="share-game"
+              type="button"
+              class="primary-button"
+              disabled
+              data-i18n="保存并分享"
+            >
+              保存并分享
+            </button>
+          </div>
+          <p id="share-status" role="status"></p>
+          <div id="share-result" class="creation-section" hidden>
+            <label for="share-link" data-i18n="发送给朋友">发送给朋友</label>
+            <input id="share-link" type="url" readonly />
+            <button
+              id="copy-share"
+              type="button"
+              class="secondary-button"
+              data-i18n="复制链接"
+            >
+              复制链接
+            </button>
+            <label
+              for="delete-link"
+              data-i18n="私人删除链接（请保存，不要分享）"
+              >私人删除链接（请保存，不要分享）</label
+            >
+            <input id="delete-link" type="url" readonly />
+            <button
+              id="copy-delete"
+              type="button"
+              class="secondary-button"
+              data-i18n="复制删除链接"
+            >
+              复制删除链接
+            </button>
+            <p data-i18n="链接保存的是当前版本。修改后再次分享会生成新的链接。">
+              链接保存的是当前版本。修改后再次分享会生成新的链接。
+            </p>
+          </div>
         </form>
       </div>
     </section>
@@ -281,8 +371,11 @@
     </main>
 
     <script src="scripts/themes.js"></script>
+    <script src="scripts/palette.js"></script>
     <script src="scripts/game.js"></script>
     <script src="scripts/theme-picker.js"></script>
+    <script src="scripts/sharing-config.js"></script>
+    <script src="scripts/sharing.js"></script>
     <script
       type="module"
       src="https://static.cloudflareinsights.com/beacon.min.js"
