@@ -585,3 +585,32 @@ select:focus-visible {
     grid-row: 1;
   }
 }
+
+/* Original author credit at the bottom of the theme screen. */
+#theme-screen > .theme-panel {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.author-credit {
+  margin-top: auto;
+  padding-top: 48px;
+  text-align: center;
+  color: var(--soft);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.author-credit::before {
+  content: "";
+  display: block;
+  border-top: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.author-credit p {
+  margin: 0;
+}
+.author-credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
