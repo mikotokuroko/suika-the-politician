@@ -1,5 +1,3 @@
-**Original author: [Anonymous contributor]([private profile]).** This project was forked from their work. Full credit for the original game and code belongs to Anonymous contributor; this repository contains subsequent modifications by mikotokuroko. The original author's commits are preserved in this repository's history, beginning with [the initial commit](https://github.com/mikotokuroko/suika-the-politician/commit/[historical commit]).
-
 # 合成不可说 · Suika the Politician
 
 A Suika-style physics game: drop matching faces, merge them, and build your own
@@ -63,15 +61,3 @@ Push `main` to deploy this site's frontend on GitHub Pages. Deploy backend chang
 separately with `npm run deploy:sharing`. For your own deployment, configure your
 Cloudflare account, KV namespace, and allowed origin in
 [sharing/wrangler.jsonc](sharing/wrangler.jsonc).
-
-## Disclaimer
-
-I do not own the photos, portraits, memes, or other third-party images included in
-this project. All rights belong to their respective creators and rights holders.
-These images are used for entertainment and parody; their inclusion does not imply
-endorsement by or affiliation with the people depicted or the rights holders.
-
-This repository does not grant permission or a license to reuse third-party images.
-If you upload custom photos, use images you own or have permission to use. If you are
-a rights holder and would like an image credited or removed, please open an issue
-in this repository so it can be addressed.
